@@ -1,21 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include <time.h>
-
 #include <omp.h>
-
-/*    
-    printf("\n\n");
-    printf("\n\n");
-    printf("*****************************\n");
-    printf("* For each point            *\n*     C = X + i*Y           *\n");
-    printf("* X range [%g,%g]      *\n", x_min, x_max);
-    printf("* Y range [%g,%g]      *\n", y_min, y_max);
-    printf("* %d: iterations          *\n", count_max);
-    printf("*     Z(n+1) = Z(n)^2 + C   *\n" );
-    printf("*****************************\n");
-*/
 
 int main();
 void timestamp();
@@ -23,7 +11,7 @@ void mandel(int count_max, double y_max, double y_min, double x_max, double x_mi
 void mandel_omp(int count_max, double y_max, double y_min, double x_max, double x_min, int n, int m);
 void mandel_task(int count_max, double y_max, double y_min, double x_max, double x_min, int n, int m);
 
-int main(){
+int main(int argc, char* argv[]){
     int m = 500, n = 500, count_max = 1000, num = 0, max = 50000;
     double wtime_omp, wtime_task, wtime, x_max = 1.25, x_min = - 2.25, y_max = 1.75, y_min = - 1.75;
     double time_list[max/1000];
@@ -38,43 +26,58 @@ int main(){
     printf("\n");
     
 
-    while(count_max <= max){
+    time_t endwait;
+    int seconds = 10;
 
-        wtime = omp_get_wtime();
-        mandel(count_max, y_max, y_min, x_max, x_min, n, m);
-        wtime = omp_get_wtime() - wtime;
-        time_list[num] = wtime;
+    endwait = time (NULL) + seconds ;
 
-        wtime_omp = omp_get_wtime();
-        mandel_omp(count_max, y_max, y_min, x_max, x_min, n, m);
-        wtime_omp = omp_get_wtime() - wtime_omp;
-        time_omp_list[num] = wtime_omp;
+    while(time (NULL) < endwait){
+        if(strcmp(argv[1], "-serial") == 0){
+            wtime = omp_get_wtime();
+            mandel(count_max, y_max, y_min, x_max, x_min, n, m);
+            wtime = omp_get_wtime() - wtime;
+            time_list[num] = wtime;
+        }
 
-        wtime_task = omp_get_wtime();
-        mandel_task(count_max, y_max, y_min, x_max, x_min, n, m);
-        wtime_task = omp_get_wtime() - wtime_task;
-        time_task_list[num] = wtime_task;
+        if(strcmp(argv[1], "-omp") == 0){
+            wtime_omp = omp_get_wtime();
+            mandel_omp(count_max, y_max, y_min, x_max, x_min, n, m);
+            wtime_omp = omp_get_wtime() - wtime_omp;
+            time_omp_list[num] = wtime_omp;
+        }
+
+        if(strcmp(argv[1], "-task") == 0){
+            wtime_task = omp_get_wtime();
+            mandel_task(count_max, y_max, y_min, x_max, x_min, n, m);
+            wtime_task = omp_get_wtime() - wtime_task;
+            time_task_list[num] = wtime_task;
+        }
         
         iterstep[num] = count_max;
-        printf("%d\n", count_max);
+        //printf("%d\n", count_max);
 
         count_max += 1000;
         num++;
     }
-    
-    printf("\nTime_list:\n");
-    for(int i = 0; i < num; i++){
-        printf("%f,", time_list[i]);
+    if(strcmp(argv[1], "-serial") == 0){
+        printf("\nTime_list:\n");
+        for(int i = 0; i < num; i++){
+            printf("%f,", time_list[i]);
+        }
     }
 
-    printf("\n\nTime_omp_list:\n");
-    for(int i = 0; i < num; i++){
-        printf("%f,", time_omp_list[i]);
+    if(strcmp(argv[1], "-omp") == 0){
+        printf("\n\nTime_omp_list:\n");
+        for(int i = 0; i < num; i++){
+            printf("%f,", time_omp_list[i]);
+        }
     }
 
-    printf("\n\nTime_task_list:\n");
-    for(int i = 0; i < num; i++){
-        printf("%f,", time_task_list[i]);
+    if(strcmp(argv[1], "-task") == 0){
+        printf("\n\nTime_task_list:\n");
+        for(int i = 0; i < num; i++){
+            printf("%f,", time_task_list[i]);
+        }
     }
 
     printf("\n\nIterations list:\n");
