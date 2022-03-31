@@ -1,0 +1,11 @@
+#!/bin/bash
+#SBATCH -A pb
+#SBATCH -n 4
+#SBATCH -time=00:60:00
+#SBATCH -error=job.%J.err
+#SBATCH -output=job.%J.out
+
+module add foss/2019b
+gcc -g -Wall -fopenmp -o mandel mandel.c
+
+srun ./mandel -task
