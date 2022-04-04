@@ -12,41 +12,39 @@ void mandel_omp(int count_max, double y_max, double y_min, double x_max, double 
 void mandel_task(int count_max, double y_max, double y_min, double x_max, double x_min, int n, int m);
 
 int main(int argc, char* argv[]){
-    int m = 500, n = 500, count_max = 1000, num = 0, max = 50000;
+    int m = 500, n = 500, count_max = 1000, num = 0, max = 10000000;
     double wtime_omp, wtime_task, wtime, x_max = 1.25, x_min = - 2.25, y_max = 1.75, y_min = - 1.75;
     double time_list[max/1000];
     double time_omp_list[max/1000];
     double time_task_list[max/1000];
     int iterstep[max/1000];
 
-
     printf("\n");
-    printf("MANDELBROT_openMP :: ");
+    printf("MANDELBROT_openMP\n");
     timestamp();
-    printf("\n");
-    
+    printf("\n\n");
 
     time_t endwait;
-    int seconds = 10;
+    int seconds = atoi(argv[1]);
 
     endwait = time (NULL) + seconds ;
 
-    while(time (NULL) < endwait){
-        if(strcmp(argv[1], "-serial") == 0){
+    while(time (NULL) < endwait || (count_max > max)){
+        if(strcmp(argv[2], "-serial") == 0){
             wtime = omp_get_wtime();
             mandel(count_max, y_max, y_min, x_max, x_min, n, m);
             wtime = omp_get_wtime() - wtime;
             time_list[num] = wtime;
         }
 
-        if(strcmp(argv[1], "-omp") == 0){
+        if(strcmp(argv[2], "-omp") == 0){
             wtime_omp = omp_get_wtime();
             mandel_omp(count_max, y_max, y_min, x_max, x_min, n, m);
             wtime_omp = omp_get_wtime() - wtime_omp;
             time_omp_list[num] = wtime_omp;
         }
 
-        if(strcmp(argv[1], "-task") == 0){
+        if(strcmp(argv[2], "-task") == 0){
             wtime_task = omp_get_wtime();
             mandel_task(count_max, y_max, y_min, x_max, x_min, n, m);
             wtime_task = omp_get_wtime() - wtime_task;
@@ -59,21 +57,21 @@ int main(int argc, char* argv[]){
         count_max += 1000;
         num++;
     }
-    if(strcmp(argv[1], "-serial") == 0){
+    if(strcmp(argv[2], "-serial") == 0){
         printf("\nTime_list:\n");
         for(int i = 0; i < num; i++){
             printf("%f,", time_list[i]);
         }
     }
 
-    if(strcmp(argv[1], "-omp") == 0){
+    if(strcmp(argv[2], "-omp") == 0){
         printf("\n\nTime_omp_list:\n");
         for(int i = 0; i < num; i++){
             printf("%f,", time_omp_list[i]);
         }
     }
 
-    if(strcmp(argv[1], "-task") == 0){
+    if(strcmp(argv[2], "-task") == 0){
         printf("\n\nTime_task_list:\n");
         for(int i = 0; i < num; i++){
             printf("%f,", time_task_list[i]);
@@ -84,6 +82,9 @@ int main(int argc, char* argv[]){
     for(int i = 0; i < num; i++){
         printf("%d,", iterstep[i]);
     }
+    printf("\n\n");
+    timestamp();
+    printf("\n");
     return 0;
 }
 

@@ -2,12 +2,12 @@
 #SBATCH -A hpc2n2022-002
 #SBATCH -n 2
 #SBATCH -c 32
-#SBATCH -J OMP
+#SBATCH -J Serial
 #SBATCH --time=01:00:00
-#SBATCH --error=job.OMP.err
-#SBATCH --output=job.OMP.out
+#SBATCH --error=job.serial.err
+#SBATCH --output=job.serial.out
 
 module add foss/2019b
 gcc -g -Wall -fopenmp -o mandel mandel.c
 
-srun ./mandel 3600 -omp
+srun ./mandel 3600 -serial

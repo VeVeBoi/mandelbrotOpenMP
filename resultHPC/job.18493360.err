@@ -1,0 +1,2 @@
+srun: error: b-cn0601: task 1: Segmentation fault (core dumped)
+srun: error: b-cn0601: task 0: Segmentation fault (core dumped)

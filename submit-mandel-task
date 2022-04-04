@@ -1,11 +1,13 @@
 #!/bin/bash
 #SBATCH -A hpc2n2022-002
-#SBATCH -n 4
-#SBATCH -time=00:60:00
-#SBATCH -error=job.%J.err
-#SBATCH -output=job.%J.out
+#SBATCH -n 2
+#SBATCH -c 32
+#SBATCH -J Task
+#SBATCH --time=01:00:00
+#SBATCH --error=job.Task.err
+#SBATCH --output=job.Task.out
 
 module add foss/2019b
 gcc -g -Wall -fopenmp -o mandel mandel.c
 
-srun ./mandel -task
+srun ./mandel 3600 -task
